@@ -1,0 +1,32 @@
+
+
+#nav-header {
+    display: flex;
+    /* justify-content: center; */
+    justify-content: space-between;
+
+    border: 1px solid #555;
+    background: hsl(187, 76%, 79%);
+    font-family: Arial;
+    opacity: .8;
+    height: 7rem;
+    padding: 1rem;
+}
+
+  
+
+/* #nav-header img {
+    height: 6rem;
+    width: auto;
+  } */
+
+.nav-button {
+    display: right;
+    border: 1px solid #555;
+    font-size: 11px;
+    background: ABD4F7;
+    opacity: .8;
+    height: 32px;
+    width: 96px;
+    padding: 1rem;
+}
