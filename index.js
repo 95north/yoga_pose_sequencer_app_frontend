@@ -4,6 +4,10 @@ const newSeqBtn = document.getElementById("new-sequence");
 const viewSeqsBtn = document.getElementById("view-sequences");
 const currentSeqContainer = document.getElementById("current-sequence");
 
+const poseCardContainer = document.querySelector(".flip-card")
+const posesDiv = document.querySelector(".poses-div")
+
+
 const sequencesUL = document.createElement("UL");
 // const poseCardContainer = document.getElementById("poses-div");
 
@@ -36,7 +40,7 @@ const sequencesUL = document.createElement("UL");
         let newSeqName = e.target[0].value
         let newSeqMemo = e.target[1].value
         let newSeqStyle = e.target[2].value
-        e.preventDefault();
+        e.preventDefault();                         // Does NOT have to be after newSeqName, etcs
 
         fetch('http://localhost:3000/sequences/', {
             method: 'POST',
@@ -58,15 +62,52 @@ const sequencesUL = document.createElement("UL");
             currentSeqContainer.appendChild(currentSeq);
 
         })
-        clearPoseCardContainer();
+        clearPoseCardContainer();                       // ADD SHOW ALL CARDS AGAIN!! 
+        
+        createSaveSeqBtn();
+    }
+    
+
+    function createSaveSeqBtn(e){
+        let seqToSave = e
+        console.log("e target is: ", e)
+        let saveSeqBtn = document.getElementById("save-seq")
+        saveSeqBtn.style.display = "block";
+        saveSeqBtn.innerText = "Save Your Sequence"
+        saveSeqBtn.onclick = saveSequence;
     }
 
+
+    function saveSequence(e){
+        let currentSeq = currentSeqContainer.firstChild.dataset.seqid
+        console.log( " currentSeq is: ", currentSeq)
+
+        // GET ALL POSES TO SAVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        let poseIDs = [1, 4];
+        let apiPostBody = []
+
+        for (const pose of poseIDs) {
+            apiPostBody.push({sequence_id: currentSeq, pose_id: pose})
+        }    
+
+        fetch(`http://localhost:3000/bulkcreatesp`, {
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            method: 'POST',
+            body: JSON.stringify(
+                apiPostBody)
+        }).then( res => res.json() )
+        .then( res => {
+            console.log(res)
+        })
+
+
+
+    }
 
 
     viewSeqsBtn.addEventListener("click", function(e){
         //clearPoseCardContainer();
         const allSeqsUL = document.getElementById("allSeqsUL");
-
         fetchAllSequences();
     })
 
@@ -84,8 +125,9 @@ const sequencesUL = document.createElement("UL");
                     createSequenceLi(sequenceRecord)
                 }
             })
-        }
-
+    }
+        
+        
 
     function createSequenceLi(sequenceRecord){
         const sequenceLi = document.createElement("LI");
@@ -94,7 +136,8 @@ const sequencesUL = document.createElement("UL");
         sequenceLi.dataset.seqid = sequenceRecord["id"];
         sequenceLi.dataset.memo = sequenceRecord["memo"];
         sequenceLi.dataset.yogastyle = sequenceRecord["yoga_style"];
-
+       
+        appendSequenceLiViewButton(sequenceLi);
         appendSequenceLiDeleteBtn(sequenceLi);
 
         sequencesUL.appendChild(sequenceLi);
@@ -114,9 +157,9 @@ const sequencesUL = document.createElement("UL");
     }
 
 
+
     function deleteSequence(e){
         e.preventDefault();
-
         let seqIdToDelete = e.target.id;
 
         fetch(`http://localhost:3000/sequences/${seqIdToDelete}`, {
@@ -129,6 +172,43 @@ const sequencesUL = document.createElement("UL");
         .then(function (res){
             console.log(res);
         })
+
+        let nodeToDisappear = (e.target).parentElement
+        // BELOW - ask if possible to search nodes for "dataset value = BLAH."
+        // let nodeToDisappear = document.getAttribute(`data-seqid${seqIdToDelete}`)
+        nodeToDisappear.style.display = "none";
+    }
+
+
+    function appendSequenceLiViewButton(sequenceLi){
+        seqToView = sequenceLi.target
+        console.log("seqToView  : ", seqToView);
+
+        let spanView = document.createElement("span");
+        spanView.setAttribute("id", `viewSeq${sequenceLi.dataset.seqid}`);
+        spanView.setAttribute("class", "viewBtns");
+        spanView.innerHTML = " ......View "; 
+        spanView.onclick = viewSequence;
+        sequenceLi.appendChild(spanView);  
+    }
+    
+    
+    function viewSequence(e){
+        console.log("e targ  is: ", e.target);
+        clearPoseCardContainer();
+        let seqToView = e.target.id.slice(7);
+        console.log("seqToView is: ", seqToView);
+
+        fetch(`http://localhost:3000/sp/${seqToView}`, {
+            method: 'GET',
+            headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
+            })
+        .then(res => (res.json() ))
+        .then(function (res){
+            console.log(res);
+            poseCardContainer.innerText = res;  // PLACEHOLDER !!!
+        })
+
     }
 
 
@@ -157,8 +237,6 @@ const sequencesUL = document.createElement("UL");
 
 
 
-const poseCardContainer = document.querySelector(".flip-card")
-const posesDiv = document.querySelector(".poses-div")
 
 
 // function createPoseCard(){
