@@ -4,16 +4,16 @@
     display: flex;
     /* justify-content: center; */
     justify-content: space-between;
-
+    color: #FFFFFF;
     border: 1px solid #555;
-    background: hsl(187, 76%, 79%);
-    font-family: Arial;
+    background-color: #000080;
+    font-family: "Comic Sans MS";
     opacity: .8;
     height: 7rem;
-    padding: 1rem;
+    padding: 2rem;
+    font-size: 25px
 }
 
-  
 
 /* #nav-header img {
     height: 6rem;
@@ -47,5 +47,4 @@ ul#allSeqList li span.delete {
   position: absolute;
   right: 5px;
   cursor: pointer;
-}   
-
+}
