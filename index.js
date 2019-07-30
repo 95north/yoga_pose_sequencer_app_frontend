@@ -288,6 +288,11 @@ function createPoseCard(){
         const flipCardInner = document.createElement("div")
         flipCardInner.classList.add("flip-card-inner")
         // flipCardInner.classList.add('col-sm')
+        flipCardInner.id = `poseId${pose.id}`
+        // const poseId = document.createElement("p")
+        // poseId.innerText = pose.id 
+        // flipCardInner.appendChild(poseId)
+
         const poseCards = document.createElement("div")
         poseCards.classList.add("flip-card-front")
         let poseHeaderName = document.createElement("h2")
@@ -312,6 +317,7 @@ function createPoseCard(){
 
 
         backPoseCardSequenceInfo(flipCardInner)
+        console.log(flipCardInner)
         // poseCardContainer.appendChild(poseCards)
       })
     })
@@ -321,51 +327,79 @@ createPoseCard() //calling the create poseCard function
 
 
 function backPoseCardSequenceInfo(flipCardInner){
-  fetch("http://localhost:3000/sequences")
-  .then(function(response){
-    return response.json()
-  })
-  .then(function(json){
-    json.forEach(function(sequence){
-      const poseCardBack = document.createElement("div")
-      poseCardBack.classList.add("flip-card-back")
-      const sequenceName = document.createElement("h1")
-      sequenceName.innerText = sequence.sequence_name
-      poseCardBack.appendChild(sequenceName)
-      const sequenceMemo = document.createElement("h2")
-      sequenceMemo.innerText = "Memo: " + sequence.memo
-      poseCardBack.appendChild(sequenceMemo)
-      let addPoseButton = document.createElement("button")
-      addPoseButton.classList.add("button")
-      addPoseButton.innerText = "Add Pose"
-      addPoseButton.addEventListener("click", addPoseToSequence() )
-      //create a new sequence pose (id)
-      //get sequence
-      poseCardBack.appendChild(addPoseButton)
-      flipCardInner.appendChild(poseCardBack)
-      poseCardContainer.appendChild(flipCardInner)
-      posesDiv.appendChild(poseCardContainer)
+//   fetch("http://localhost:3000/sequences")
+//   .then(function(response){
+//     return response.json()
+//   })
+//   .then(function(json){
+//     json.forEach(function(sequence){
+//       const poseCardBack = document.createElement("div")
+//       poseCardBack.classList.add("flip-card-back")
+//       const sequenceName = document.createElement("h1")
+//       sequenceName.innerText = sequence.sequence_name
+//       poseCardBack.appendChild(sequenceName)
+//       const sequenceMemo = document.createElement("h2")
+//       sequenceMemo.innerText = "Memo: " + sequence.memo
+//       poseCardBack.appendChild(sequenceMemo)
 
-    })
-  })
+//       poseId = flipCardInner.id.slice(6);
+//       let addPoseForm = document.createElement("button");
+//     //    addPoseForm.innerHTML = `<id="flagBtn${poseId}" name="poseN" ><br>`
+//         console.log(addPoseForm)
+//         addPoseForm.id = `flagBtn${poseId}`
+//         addPoseForm.innerText = "Add Pose to Your Sequence"
+//     //   let addPoseForm = document.createElement("form");      
+//     //   addPoseForm.innerHTML = `<input type="submit" id="flagBtn${poseId}" name="poseN" value = "Add Pose to Your Sequence"><br> <br>`
+      
+//     //   addPoseForm.value = "Add Pose to Your Sequence"  // DOES ONO WORk
 
+//       poseCardBack.appendChild(addPoseForm)
+//       flipCardInner.appendChild(poseCardBack)
+//       poseCardContainer.appendChild(flipCardInner)
+//       posesDiv.appendChild(poseCardContainer)
+//       addPoseToSequence(poseId)
+//     })
+// })
+
+    poseId = flipCardInner.id.slice(6);
+    let poseCardBack = document.createElement("div");
+    poseCardBack.classList.add("flip-card-back");
+
+    let addPoseForm = document.createElement("button");
+    addPoseForm.id = `flagBtn${poseId}`;
+    addPoseForm.innerText = "Add Pose to Your Sequence";
+    
+    poseCardBack.appendChild(addPoseForm);
+    flipCardInner.appendChild(poseCardBack);
+    poseCardContainer.appendChild(flipCardInner);
+    posesDiv.appendChild(poseCardContainer);
+
+    addPoseToSequence(poseId)
 } //end of backPoseCardSequenceInfo
 
 
-function addPoseToSequence(){
-  //work w/ SequencePose
-  // fetch("http://localhost:3000/sequence_poses", {
-  //   method: "POST",
-  //   headers: {  'Content-Type': 'application/json',
-  //               'Accept' : 'application/json'
-  //   },
-  //   body: JSON.stringify(
-  //
-  //   )
 
-  })
+function addPoseToSequence(poseId){
+    const flagBtn = (document.getElementById(`flagBtn${poseId}`))
+    console.log(flagBtn)
+    // const submitPose = document.getElementById(`submitForm${poseId}`)
+    flagBtn.addEventListener("click", function(e){
+        flagPose(e)
+    } );
+    // submitPose.onclick =  console.log("submitPose.id ----  ", submitPose.id)
+}
 
 
+function flagPose(e){
+    //e.preventDefault();
+    let poseId = e.target.id.slice(7)
+    console.log(poseId);
+    //we want to render a form after pressing button adn get duration and order #
+    //and then submit all of that info 
+
+    
+
+    
 
 
-} //end of addPoseToSequence
+} //end of flagPose
