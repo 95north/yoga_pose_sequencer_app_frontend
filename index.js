@@ -364,6 +364,7 @@ function backPoseCardSequenceInfo(flipCardInner){
     poseId = flipCardInner.id.slice(6);
     let poseCardBack = document.createElement("div");
     poseCardBack.classList.add("flip-card-back");
+    poseCardBack.id = `cardBack${poseId}`;
 
     let addPoseForm = document.createElement("button");
     addPoseForm.id = `flagBtn${poseId}`;
@@ -381,12 +382,9 @@ function backPoseCardSequenceInfo(flipCardInner){
 
 function addPoseToSequence(poseId){
     const flagBtn = (document.getElementById(`flagBtn${poseId}`))
-    console.log(flagBtn)
-    // const submitPose = document.getElementById(`submitForm${poseId}`)
     flagBtn.addEventListener("click", function(e){
         flagPose(e)
     } );
-    // submitPose.onclick =  console.log("submitPose.id ----  ", submitPose.id)
 }
 
 
@@ -394,12 +392,86 @@ function flagPose(e){
     //e.preventDefault();
     let poseId = e.target.id.slice(7)
     console.log(poseId);
+
+    addPoseForm = document.getElementById(`flagBtn${poseId}`)
+
+    let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+    flipCardInnerToFlag.dataset.flag = "t"
+    console.log(flipCardInnerToFlag.dataset.flag);
+    createFlagPoseForm(poseId)
+
     //we want to render a form after pressing button adn get duration and order #
     //and then submit all of that info 
 
-    
-
-    
-
-
 } //end of flagPose
+
+
+function createFlagPoseForm(poseId){
+    let poseC = document.getElementById(`cardBack${poseId}`)
+    let poseCard = poseC//.parentElement
+
+    console.log("poseCard bilshfak is:   ", poseCard)
+
+    const buttonToDelete = document.getElementById(`flagBtn${poseId}`)
+    buttonToDelete.remove()
+
+    // while (poseCard.firstChild) {
+    //   poseCard.removeChild(poseCard.firstChild);
+    // }
+
+    const formForOrderAndDuration = document.createElement("form")
+    formForOrderAndDuration.innerHTML = `
+    <form action="/action_page.php">
+    <input type="number" name="order_no" placeholder="display pose order"><br>
+    <input type="number" name="duration" placeholder= "duration of sequence"> <br>
+    <input type="submit" value="Submit">
+  </form>
+  `
+  
+
+    formForOrderAndDuration.id = `odForm${poseId}`
+  poseCard.appendChild(formForOrderAndDuration)
+  
+  formForOrderAndDuration.addEventListener("submit", function(e){
+      getFlagPoseInfo(e, poseId)   
+  })
+  //after this poseId is being changed to 5 
+}
+
+function getFlagPoseInfo(e, poseId){
+    e.preventDefault();
+    console.log("e.tag: ",  e.target[0].value )
+
+    let orderNo = e.target[0].value;
+    let durationNo = e.target[1].value;
+  let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+  console.log("flipCardInnerToFlag is:  ", flipCardInnerToFlag)
+  flipCardInnerToFlag.dataset.order_no= orderNo;
+  // duration
+
+  flipCardInnerToFlag.dataset.duration = durationNo;
+
+  removePoseForm(poseId)
+}
+
+function removePoseForm(poseId){
+    const removePoseButton = document.createElement("button")
+    removePoseButton.innerText = "Remove Pose From Sequence"
+    let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+    flipCardInnerToFlag.dataset.flag = "f"
+    console.log("flipCardInnerToFlag....", flipCardInnerToFlag)
+    //let orderDurationForm = document.getElementById(`odForm${poseId}`);
+    let formToDelete = document.getElementById(`odForm${poseId}`);
+
+    console.log("Form -- ", formToDelete)
+    
+    addRemovePoseButton(poseId);
+} //end of removePoseForm 
+
+    function addRemovePoseButton(poseId){
+        let formToDelete = document.getElementById(`odForm${poseId}`);
+        formToDelete.style.display = "none";
+    }
+
+  
+  //then show order # and duration and display button to remove pose from sequence 
