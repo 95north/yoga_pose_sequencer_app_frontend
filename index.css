@@ -30,3 +30,22 @@
     width: 96px;
     padding: 1rem;
 }
+
+
+ /* USE for LIs: */
+ul#todoList li {
+  position: relative;
+  padding: 5px;
+  margin: 5px;
+  background-color: #ededed;
+  border: 2px inset #ededed;
+}
+
+
+ul#allSeqList li span.delete {
+  display: inline-block;
+  position: absolute;
+  right: 5px;
+  cursor: pointer;
+}   
+
