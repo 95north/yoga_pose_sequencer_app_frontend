@@ -255,7 +255,6 @@ const sequencesUL = document.createElement("UL");
         let timeCounter = 0;
         let holdTimes = [0]
 
-
         apiSP.forEach(function (pose){
             console.log(" pose.id is: ", pose.pose_id)
             holdTimes.push(pose.duration * 60 * 10)   // is 10 not 1000!!!!! 
@@ -272,12 +271,11 @@ const sequencesUL = document.createElement("UL");
             let durationTime = holdTimes[timeCounter];
             setTimeout(function(){ 
                 createOnePoseCard(pose.pose_id);
+                Console.log("duration time: ", durationTime)
                 // clearPoseCardContainer();
              }, durationTime);
 
             timeCounter += 1;
-
-            
         }) // ends apiSP.forEach
 
     }
@@ -293,7 +291,6 @@ const sequencesUL = document.createElement("UL");
         return response.json()
         })
         .then(function(pose){ 
-            console.log("pose is:  ", pose);
 
             const flipCardInner = document.createElement("div")
             flipCardInner.classList.add("flip-card-inner")
