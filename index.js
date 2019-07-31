@@ -186,15 +186,19 @@ const sequencesUL = document.createElement("UL");
         })
 
         let nodeToDisappear = (e.target).parentElement
-        // BELOW - ask if possible to search nodes for "dataset value = BLAH."
-        // let nodeToDisappear = document.getAttribute(`data-seqid${seqIdToDelete}`)
         nodeToDisappear.style.display = "none";
     } //end of function
 
 
     function appendSequenceLiViewButton(sequenceLi){
+
         seqToView = sequenceLi.target
         // console.log("seqToView  : ", seqToView);
+
+        // seqToView = sequenceLi.target
+        // console.log("seqToView  : ", seqToView);   // UNDEFINEDs
+
+
         let spanView = document.createElement("span");
         spanView.setAttribute("id", `viewSeq${sequenceLi.dataset.seqid}`);
         spanView.setAttribute("class", "viewBtns");
@@ -206,10 +210,13 @@ const sequencesUL = document.createElement("UL");
 
 
     function viewSequence(e){
-        console.log("e targ  is: ", e.target);
         clearPoseCardContainer();
         let seqToView = e.target.id.slice(7);
-        console.log("seqToView is: ", seqToView);
+
+      
+        console.log("seqToView is: ", seqToView);  
+
+
         fetch(`http://localhost:3000/sp/${seqToView}`, {
             method: 'GET',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
@@ -218,8 +225,8 @@ const sequencesUL = document.createElement("UL");
             return response.json()
         })
         .then(function (sequencePoseView){
-            console.log(sequencePoseView);
-             showPoseCardEach(sequencePoseView);  // PLACEHOLDER !!!
+            //showPoseCardEach(sequencePoseView);  // PLACEHOLDER !!!
+            playSequence(sequencePoseView);
         })
     } //end of function
 
@@ -244,6 +251,78 @@ const sequencesUL = document.createElement("UL");
         })
     } //end of function
 
+
+    function playSequence(apiSP){
+        console.log("apiSP is: ", apiSP)
+        console.log("apiSP  0 is: ", apiSP[0])
+
+        let timeCounter = 0;
+        let holdTimes = [0]
+
+        apiSP.forEach(function (pose){
+            console.log(" pose.id is: ", pose.pose_id)
+            holdTimes.push(pose.duration * 60 * 10)   // is 10 not 1000!!!!! 
+        }) // ends apiSP.forEach
+
+        console.log("Hold times: ", holdTimes)
+
+        apiSP.forEach(function (pose){
+            
+            // if( (timeCounter) == (holdTimes.length-1)){
+            //     console.log("I DDO TIHNGS")
+            //     // clearPoseCardContainer();
+            // }
+            let durationTime = holdTimes[timeCounter];
+            setTimeout(function(){ 
+                createOnePoseCard(pose.pose_id);
+                Console.log("duration time: ", durationTime)
+                // clearPoseCardContainer();
+             }, durationTime);
+
+            timeCounter += 1;
+        }) // ends apiSP.forEach
+
+    }
+    
+
+    function createOnePoseCard(poseId){
+        clearPoseCardContainer();
+    
+        console.log("Pose ID is: ", poseId)
+
+        fetch(`http://localhost:3000/poses/${poseId}`)
+        .then(function(response){
+        return response.json()
+        })
+        .then(function(pose){ 
+
+            const flipCardInner = document.createElement("div")
+            flipCardInner.classList.add("flip-card-inner")
+            flipCardInner.id = `poseId${pose.id}`
+    
+            const poseCards = document.createElement("div")
+            poseCards.classList.add("flip-card-front")
+            let poseHeaderName = document.createElement("h2")
+            poseHeaderName.innerText = pose.pose_name
+            poseCards.appendChild(poseHeaderName)
+            let poseImage = document.createElement("img")
+            poseImage.src = pose.photo_url
+            poseImage.classList.add("center")
+            poseCards.appendChild(poseImage)
+            let poseIntensity = document.createElement("h3")
+            poseIntensity.innerText = "Intensity: "+ pose.intensity
+            poseCards.appendChild(poseIntensity)
+            let posePurpose = document.createElement("h3")
+            posePurpose.innerText = "Purpose: "+pose.purpose
+            poseCards.appendChild(posePurpose)
+            let poseProp = document.createElement("h3")
+            poseProp.innerText = "Props: "+ pose.prop
+            poseCards.appendChild(poseProp)
+            flipCardInner.appendChild(poseCards)
+            poseCardContainer.appendChild(flipCardInner);
+        })
+
+    }
 
     function clearPoseCardContainer(){
         while (poseCardContainer.firstChild) {
