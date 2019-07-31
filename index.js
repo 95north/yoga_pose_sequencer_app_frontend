@@ -258,25 +258,25 @@ const sequencesUL = document.createElement("UL");
 
         let timeCounter = 0;
         let holdTimes = [0]
+        var totalTime = 0;
 
         apiSP.forEach(function (pose){
             console.log(" pose.id is: ", pose.pose_id)
-            holdTimes.push(pose.duration * 60 * 10)   // is 10 not 1000!!!!! 
+            holdTimes.push((pose.duration * 60 * 10) + totalTime )   // is 10 not 1000!!!!! 
+            totalTime += pose.duration * 60 * 10
         }) // ends apiSP.forEach
+
+
 
         console.log("Hold times: ", holdTimes)
 
         apiSP.forEach(function (pose){
             
-            // if( (timeCounter) == (holdTimes.length-1)){
-            //     console.log("I DDO TIHNGS")
-            //     // clearPoseCardContainer();
-            // }
             let durationTime = holdTimes[timeCounter];
             setTimeout(function(){ 
                 createOnePoseCard(pose.pose_id);
-                Console.log("duration time: ", durationTime)
-                // clearPoseCardContainer();
+                console.log("duration time: ", durationTime)
+                clearPoseCardContainer();
              }, durationTime);
 
             timeCounter += 1;
