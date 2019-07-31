@@ -37,6 +37,7 @@ const sequencesUL = document.createElement("UL");
 
     function createNewSequence(e){
         clearCurrentSeqContainer();
+
         let newSeqName = e.target[0].value
         let newSeqMemo = e.target[1].value
         let newSeqStyle = e.target[2].value
@@ -63,7 +64,8 @@ const sequencesUL = document.createElement("UL");
 
         })
         clearPoseCardContainer();                       // ADD SHOW ALL CARDS AGAIN!! 
-        
+        createPoseCard() //calling the create poseCard function
+
         createSaveSeqBtn();
     }
     
@@ -83,11 +85,12 @@ const sequencesUL = document.createElement("UL");
         console.log( " currentSeq is: ", currentSeq)
 
         // GET ALL POSES TO SAVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        let poseIDs = [1, 4];
+        // poseIDs = array of array. [ [pose_id, order#, duration], [p,o,d].. ]
+        let poseIDs = queryPoseCardSaveFlags(); // Call function
         let apiPostBody = []
 
         for (const pose of poseIDs) {
-            apiPostBody.push({sequence_id: currentSeq, pose_id: pose})
+            apiPostBody.push({sequence_id: currentSeq, pose_id: pose[0], order_no: pose[1], duration: pose[2] })
         }    
 
         fetch(`http://localhost:3000/bulkcreatesp`, {
@@ -99,9 +102,22 @@ const sequencesUL = document.createElement("UL");
         .then( res => {
             console.log(res)
         })
+    }
 
-
-
+    function queryPoseCardSaveFlags(){
+        let arrayFlaggedPoseCards = []
+        // search all pose cards for dataset 
+        let allPoseCards = Array.from(document.querySelectorAll(".flip-card-inner"));
+        console.log("allPoseCards is: ", allPoseCards)
+        for (const p of allPoseCards) {
+            if (p.dataset.flag == "t") {
+                console.log("line 111 TRUE, pose Id is: ", p.id)
+                let tempArr = [p.id.slice(6)  , p.dataset.order_no, p.dataset.duration ];
+                arrayFlaggedPoseCards.push(tempArr);
+            } 
+        }
+        console.log("arrayFlaggedPoseCards --- ", arrayFlaggedPoseCards)
+        return arrayFlaggedPoseCards;
     }
 
 
@@ -203,10 +219,33 @@ const sequencesUL = document.createElement("UL");
             method: 'GET',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
             })
-        .then(res => (res.json() ))
-        .then(function (res){
-            console.log(res);
-            poseCardContainer.innerText = res;  // PLACEHOLDER !!!
+        .then(function(response){
+            return response.json()
+        })
+        .then(function (sequencePoseView){
+            console.log(sequencePoseView);
+             showPoseCardEach(sequencePoseView);  // PLACEHOLDER !!!
+        })
+    }
+
+    function showPoseCardEach(sequencePoseView){
+        clearPoseCardContainer()
+        sequencePoseView.forEach(function(sequencePose){
+            const showPoseViewCard = document.createElement("div")
+            showPoseViewCard.classList.add("card")
+            const getPoseId = document.createElement("p")
+            getPoseId.innerText = sequencePose.pose_id
+            showPoseViewCard.appendChild(getPoseId)
+            const getSequenceId = document.createElement("p")
+            getSequenceId.innerText = sequencePose.sequence_id
+            showPoseViewCard.appendChild(getSequenceId)
+            const getSequenceOrderNo = document.createElement("p")
+            getSequenceOrderNo.innerText = sequencePose.order_no
+            showPoseViewCard.appendChild(getSequenceOrderNo)
+            const getSequenceDuration = document.createElement("p")
+            getSequenceDuration.innerText = sequencePose.duration
+            showPoseViewCard.appendChild(getSequenceDuration)
+            poseCardContainer.appendChild(showPoseViewCard)
         })
 
     }
@@ -232,51 +271,6 @@ const sequencesUL = document.createElement("UL");
 
 
 
-
-
-
-
-
-
-
-// function createPoseCard(){
-//   fetch("http://localhost:3000/poses")
-//     .then(function(response){
-//       return response.json()
-//     })
-//     .then(function(pose){
-//       pose.forEach(function(pose){
-//         const poseCards = document.createElement("div")
-//         poseCards.classList.add("card")
-//         let poseHeaderName = document.createElement("h2")
-//         poseHeaderName.innerText = pose.pose_name
-//         poseCards.appendChild(poseHeaderName)
-//         let poseImage = document.createElement("img")
-//         poseImage.src = pose.photo_url
-//         poseImage.classList.add("center")
-//         poseCards.appendChild(poseImage)
-//         let poseIntensity = document.createElement("h3")
-//         poseIntensity.innerText = "Intensity: "+ pose.intensity
-//         poseCards.appendChild(poseIntensity)
-//         let posePurpose = document.createElement("h3")
-//         posePurpose.innerText = "Purpose: "+pose.purpose
-//         poseCards.appendChild(posePurpose)
-//         let poseProp = document.createElement("h3")
-//         poseProp.innerText = "Props: "+ pose.prop
-//         poseCards.appendChild(poseProp)
-//         let addPoseButton = document.createElement("button")
-//         addPoseButton.classList.add("button")
-//         addPoseButton.innerText = "Add Pose"
-//         poseCards.appendChild(addPoseButton)
-//         poseCardContainer.appendChild(poseCards)
-//       })
-//     })
-// } //edn of createPoseCard
-
-
-
-//test
-
 function createPoseCard(){
   fetch("http://localhost:3000/poses")
     .then(function(response){
@@ -288,6 +282,11 @@ function createPoseCard(){
         const flipCardInner = document.createElement("div")
         flipCardInner.classList.add("flip-card-inner")
         // flipCardInner.classList.add('col-sm')
+        flipCardInner.id = `poseId${pose.id}`
+        // const poseId = document.createElement("p")
+        // poseId.innerText = pose.id 
+        // flipCardInner.appendChild(poseId)
+
         const poseCards = document.createElement("div")
         poseCards.classList.add("flip-card-front")
         let poseHeaderName = document.createElement("h2")
@@ -312,60 +311,177 @@ function createPoseCard(){
 
 
         backPoseCardSequenceInfo(flipCardInner)
+        console.log(flipCardInner)
         // poseCardContainer.appendChild(poseCards)
       })
     })
 } //edn of createPoseCard
 
-createPoseCard() //calling the create poseCard function
 
 
 function backPoseCardSequenceInfo(flipCardInner){
-  fetch("http://localhost:3000/sequences")
-  .then(function(response){
-    return response.json()
-  })
-  .then(function(json){
-    json.forEach(function(sequence){
-      const poseCardBack = document.createElement("div")
-      poseCardBack.classList.add("flip-card-back")
-      const sequenceName = document.createElement("h1")
-      sequenceName.innerText = sequence.sequence_name
-      poseCardBack.appendChild(sequenceName)
-      const sequenceMemo = document.createElement("h2")
-      sequenceMemo.innerText = "Memo: " + sequence.memo
-      poseCardBack.appendChild(sequenceMemo)
-      let addPoseButton = document.createElement("button")
-      addPoseButton.classList.add("button")
-      addPoseButton.innerText = "Add Pose"
-      addPoseButton.addEventListener("click", addPoseToSequence() )
-      //create a new sequence pose (id)
-      //get sequence
-      poseCardBack.appendChild(addPoseButton)
-      flipCardInner.appendChild(poseCardBack)
-      poseCardContainer.appendChild(flipCardInner)
-      posesDiv.appendChild(poseCardContainer)
+//   fetch("http://localhost:3000/sequences")
+//   .then(function(response){
+//     return response.json()
+//   })
+//   .then(function(json){
+//     json.forEach(function(sequence){
+//       const poseCardBack = document.createElement("div")
+//       poseCardBack.classList.add("flip-card-back")
+//       const sequenceName = document.createElement("h1")
+//       sequenceName.innerText = sequence.sequence_name
+//       poseCardBack.appendChild(sequenceName)
+//       const sequenceMemo = document.createElement("h2")
+//       sequenceMemo.innerText = "Memo: " + sequence.memo
+//       poseCardBack.appendChild(sequenceMemo)
 
-    })
-  })
+//       poseId = flipCardInner.id.slice(6);
+//       let addPoseForm = document.createElement("button");
+//     //    addPoseForm.innerHTML = `<id="flagBtn${poseId}" name="poseN" ><br>`
+//         console.log(addPoseForm)
+//         addPoseForm.id = `flagBtn${poseId}`
+//         addPoseForm.innerText = "Add Pose to Your Sequence"
+//     //   let addPoseForm = document.createElement("form");      
+//     //   addPoseForm.innerHTML = `<input type="submit" id="flagBtn${poseId}" name="poseN" value = "Add Pose to Your Sequence"><br> <br>`
+      
+//     //   addPoseForm.value = "Add Pose to Your Sequence"  // DOES ONO WORk
 
+//       poseCardBack.appendChild(addPoseForm)
+//       flipCardInner.appendChild(poseCardBack)
+//       poseCardContainer.appendChild(flipCardInner)
+//       posesDiv.appendChild(poseCardContainer)
+//       addPoseToSequence(poseId)
+//     })
+// })
+
+    poseId = flipCardInner.id.slice(6);
+    let poseCardBack = document.createElement("div");
+    poseCardBack.classList.add("flip-card-back");
+    poseCardBack.id = `cardBack${poseId}`;
+
+    let addPoseForm = document.createElement("button");
+    addPoseForm.id = `flagBtn${poseId}`;
+    addPoseForm.innerText = "Add Pose to Your Sequence";
+    
+    poseCardBack.appendChild(addPoseForm);
+    flipCardInner.appendChild(poseCardBack);
+    poseCardContainer.appendChild(flipCardInner);
+    posesDiv.appendChild(poseCardContainer);
+
+    addPoseToSequence(poseId)
 } //end of backPoseCardSequenceInfo
 
 
-function addPoseToSequence(){
-  //work w/ SequencePose
-  // fetch("http://localhost:3000/sequence_poses", {
-  //   method: "POST",
-  //   headers: {  'Content-Type': 'application/json',
-  //               'Accept' : 'application/json'
-  //   },
-  //   body: JSON.stringify(
-  //
-  //   )
 
+function addPoseToSequence(poseId){
+    const flagBtn = (document.getElementById(`flagBtn${poseId}`))
+    flagBtn.addEventListener("click", function(e){
+        flagPose(e)
+    } );
+}
+
+
+function flagPose(e){
+    //e.preventDefault();
+    let poseId = e.target.id.slice(7)
+    console.log(poseId);
+
+    addPoseForm = document.getElementById(`flagBtn${poseId}`)
+
+    let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+    flipCardInnerToFlag.dataset.flag = "t"
+    console.log(flipCardInnerToFlag.dataset.flag);
+    createFlagPoseForm(poseId)
+
+} //end of flagPose
+
+
+function createFlagPoseForm(poseId){
+    let poseC = document.getElementById(`cardBack${poseId}`)
+    let poseCard = poseC//.parentElement
+
+    const buttonToDelete = document.getElementById(`flagBtn${poseId}`)
+    buttonToDelete.remove()
+
+    // while (poseCard.firstChild) {
+    //   poseCard.removeChild(poseCard.firstChild);
+    // }
+
+    const formForOrderAndDuration = document.createElement("form")
+    formForOrderAndDuration.innerHTML = `
+    <form action="/action_page.php">
+    <input type="number" name="order_no" placeholder="display pose order"><br>
+    <input type="number" name="duration" placeholder= "duration of sequence"> <br>
+    <input type="submit" value="Submit">
+  </form>
+  `
+  
+
+    formForOrderAndDuration.id = `odForm${poseId}`
+  poseCard.appendChild(formForOrderAndDuration)
+  
+  formForOrderAndDuration.addEventListener("submit", function(e){
+      getFlagPoseInfo(e, poseId)   
   })
+  //after this poseId is being changed to 5 
+}
+
+function getFlagPoseInfo(e, poseId){
+    e.preventDefault();
+    console.log("e.tag: ",  e.target[0].value )
+
+    let orderNo = e.target[0].value;
+  let durationNo = e.target[1].value;
+  let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+  console.log("flipCardInnerToFlag is:  ", flipCardInnerToFlag)
+  flipCardInnerToFlag.dataset.order_no= orderNo;
+  // duration
+  flipCardInnerToFlag.dataset.duration = durationNo;
+  removePoseForm(poseId)
+}
+
+function removePoseForm(poseId){
+    // console.log("flipCardInnerToFlag....", flipCardInnerToFlag)
+    //let orderDurationForm = document.getElementById(`odForm${poseId}`);
+    let formToDelete = document.getElementById(`odForm${poseId}`);
+    
+    addRemovePoseButton(poseId);
+} //end of removePoseForm 
+
+function addRemovePoseButton(poseId){
+    let formToDelete = document.getElementById(`odForm${poseId}`);
+    formToDelete.style.display = "none";
+
+    //show order # and duration 
+    const removePoseButton = document.createElement("button")
+    removePoseButton.innerText = "Remove Pose From Sequence"
+    removePoseButton.id = `flagBtn${poseId}`;
+    formToDelete.parentElement.appendChild(removePoseButton)
+
+    removePoseButton.addEventListener("click", function(e){
+        addAddPoseButton(e, removePoseButton);
+    })
+}
 
 
+function addAddPoseButton(e, removePoseButton){
+    poseId = e.target.id.slice(7);
+    console.log("e.target is: ", e.target);
+    console.log("poseId is: ", poseId);
 
+    let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
+    flipCardInnerToFlag.dataset.flag = "f"
+    console.log(flipCardInnerToFlag.dataset.flag);
 
-} //end of addPoseToSequence
+    let addPoseForm = document.createElement("button");
+    addPoseForm.id = `flagBtn${poseId}`;
+    addPoseForm.innerText = "Add Pose to Your Sequence";
+
+    removePoseButton.remove();
+    cardBackToAppendTo = document.getElementById(`cardBack${poseId}`);
+    cardBackToAppendTo.appendChild(addPoseForm);
+    addPoseToSequence(poseId);
+}
+
+  
+  //then show order # and duration and display button to remove pose from sequence 
