@@ -2,16 +2,14 @@
 
 #nav-header {
     display: flex;
-    /* justify-content: center; */
     justify-content: space-between;
     color: #FFFFFF;
     border: 1px solid #555;
     background-color: #000080;
-    font-family: "Comic Sans MS";
-    opacity: .8;
+    font-family: "Papyrus";
     height: 7rem;
     padding: 2rem;
-    font-size: 25px
+    font-size: 10px;
 }
 
 
@@ -20,16 +18,23 @@
     width: auto;
   } */
 
+form {
+  font-family: "Papyrus"
+}
+
 .nav-button {
     display: right;
-    border: 1px solid #555;
-    font-size: 11px;
-    background: ABD4F7;
-    opacity: .8;
-    height: 32px;
-    width: 96px;
-    padding: 1rem;
+    border-radius: 25px;
+    height: 70px;
+    width: 130px;
+    background-color:	red;
+    color: 	#FFFFFF;
+    font-family: "Papyrus";
+    font-size: 12px;
+    text-align: center;
+    border: #FFFFFF;
 }
+
 
 
  /* USE for LIs: */
