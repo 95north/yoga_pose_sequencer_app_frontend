@@ -18,17 +18,18 @@ body {
 }
 
 
-/* .card{
+.card{
   text-align: center;
   padding: 1rem;
   width: 15rem;
   height: 25rem;
+  float:left;
   display: inline-grid;
   margin: 1rem 2rem;
   box-shadow: 3px 4px #87CEFA;
   background-color: #F0F8FF;
   color: #000080;
-} */
+} 
 
  img {
   max-width:215px;
@@ -62,8 +63,15 @@ body {
   width: 100%;
   height: 250%;
   text-align: center;
+  /* float:left; */
   display: inline-grid;
+  /* border: 1px solid black; */
 }
+/* 
+.flip-card-row{
+  position:relative;
+  float:left;
+} */
 
 /* Do an horizontal flip when you move the mouse over the flip box container */
 .flip-card-inner:hover  {
