@@ -57,7 +57,7 @@ const sequencesUL = document.createElement("UL");
 
         })
         clearPoseCardContainer();                       // ADD SHOW ALL CARDS AGAIN!!
-        createPoseCard() //calling the create poseCard function
+        createPoseCard() //calling the create ALL poseCard function
 
         createSaveSeqBtn();
     } //end of function
