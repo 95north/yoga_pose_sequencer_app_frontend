@@ -282,6 +282,12 @@ const sequencesUL = document.createElement("UL");
             timeCounter += 1;
         }) // ends apiSP.forEach
 
+        setTimeout(function(){
+            clearPoseCardContainer()
+            let finishedMsg = document.createElement("H1")
+            finishedMsg.innerText = "Sequence Complete! Hope you had a good session"
+            poseCardContainer.appendChild(finishedMsg);
+        }, (totalTime+5000) )
     }
     
 
@@ -295,6 +301,12 @@ const sequencesUL = document.createElement("UL");
         return response.json()
         })
         .then(function(pose){ 
+            const poseDesc = pose.description
+            let poseDes = document.createElement("h2");
+            poseDes.classList.add("posedescription");
+            poseDes.style = "text-align:right;"
+            poseDes.style.paddingLeft= "10px";
+            poseDes.innerText = poseDesc
 
             const flipCardInner = document.createElement("div")
             flipCardInner.classList.add("flip-card-inner")
@@ -320,6 +332,8 @@ const sequencesUL = document.createElement("UL");
             poseCards.appendChild(poseProp)
             flipCardInner.appendChild(poseCards)
             poseCardContainer.appendChild(flipCardInner);
+
+            poseCardContainer.appendChild(poseDes);
         })
 
     }
