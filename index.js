@@ -51,10 +51,12 @@ const sequencesUL = document.createElement("UL");
             let currentSeq = document.createElement("P");
             currentSeq.innerText = `Current Sequence: ${res["sequence_name"]}.  Yoga Style: ${res["yoga_style"]}`
             currentSeq.dataset.seqid = res["id"];
+            currentSeq.dataset.seqname = res["sequence_name"];
             currentSeq.dataset.memo = res["memo"];
             currentSeq.dataset.yogastyle = res["yoga_style"];
             currentSeqContainer.appendChild(currentSeq);
-
+            console.log("Ln 58 dataset seqname", currentSeq.dataset.seqname)
+            console.log("------", currentSeq)
         })
         clearPoseCardContainer();                       // ADD SHOW ALL CARDS AGAIN!!
         createPoseCard() //calling the create ALL poseCard function
@@ -176,9 +178,12 @@ const sequencesUL = document.createElement("UL");
 
         sequenceLi.dataset.seqid = sequenceRecord["id"];
         sequenceLi.dataset.memo = sequenceRecord["memo"];
+        sequenceLi.dataset.seqname = sequenceRecord["sequence_name"];
+
         sequenceLi.dataset.yogastyle = sequenceRecord["yoga_style"];
 
         appendSequenceLiViewButton(sequenceLi);
+        appendSequenceLiEditBtn(sequenceLi);
         appendSequenceLiDeleteBtn(sequenceLi);
 
         sequencesUL.appendChild(sequenceLi);
@@ -186,48 +191,10 @@ const sequencesUL = document.createElement("UL");
 
     } //end of function
 
-    function appendSequenceLiDeleteBtn(seqLi){
-        // let sequenceLiDeleteBtn = document.createElement("BUTTON");
-        console.log("seqLi is: ", seqLi);
-        let spanDelete = document.createElement("span");
-        spanDelete.setAttribute("id", seqLi.dataset.seqid);
-        spanDelete.setAttribute("class", "delete");
-        spanDelete.innerHTML = " Delete "; //"&nbsp;&#10007;&nbsp;";
-        spanDelete.onclick = deleteSequence;
-        spanDelete.classList.add("nav-button")
-        seqLi.appendChild(spanDelete);
-    } //end of function
-
-
-
-    function deleteSequence(e){
-        e.preventDefault();
-        let seqIdToDelete = e.target.id;
-
-        fetch(`http://localhost:3000/sequences/${seqIdToDelete}`, {
-            method: 'DELETE',
-            headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
-            body: JSON.stringify({
-                 "id": seqIdToDelete
-            })
-        }).then(res => (res.json() ))
-        .then(function (res){
-            console.log(res);
-        })
-
-        let nodeToDisappear = (e.target).parentElement
-        nodeToDisappear.style.display = "none";
-    } //end of function
-
 
     function appendSequenceLiViewButton(sequenceLi){
 
         seqToView = sequenceLi.target
-        // console.log("seqToView  : ", seqToView);
-
-        // seqToView = sequenceLi.target
-        // console.log("seqToView  : ", seqToView);   // UNDEFINEDs
-
 
         let spanView = document.createElement("span");
         spanView.setAttribute("id", `viewSeq${sequenceLi.dataset.seqid}`);
@@ -238,6 +205,79 @@ const sequencesUL = document.createElement("UL");
         sequenceLi.appendChild(spanView);
     } //end of function
 
+    function appendSequenceLiEditBtn(sequenceLi){
+        seqToView = sequenceLi.target;
+        let spanView = document.createElement("span");
+        spanView.setAttribute("id", `editSeq${sequenceLi.dataset.seqid}`);
+        spanView.setAttribute("class", "viewBtns");
+        spanView.innerHTML = " Edit ";
+        spanView.onclick = editSequence;
+        spanView.classList.add("nav-button")
+        sequenceLi.appendChild(spanView);
+    }
+
+    function editSequence(e){
+        clearPoseCardContainer();
+        let seqId = e.target.id.slice(7);
+        console.log("e in Edit Seq is: ", e.target)
+        let parentSeq = e.target.parentElement
+        console.log("parentSeq IS: ", parentSeq)
+        const newSeqForm = document.createElement("form");
+        newSeqForm.id = `editSeq${seqId}`
+        let namePH = parentSeq.dataset.seqname;  
+        console.log("namePH is-- ", namePH);
+        let memoPH = parentSeq.dataset.memo;
+        let stylePH = parentSeq.dataset.yogastyle;
+        let f =
+            ` <br>
+            <br>
+            New Sequence Name:<br>
+            <input type="text" name="newSeqName" placeholder=${namePH}><br>
+            New Sequence Memo:<br>
+            <input type="text" name="newSeqMemo" placeholder=${memoPH}><br>
+            New Sequence Yoga Style:<br>
+            <input type="text" name="newSeqStyle" placeholder=${stylePH}><br>
+            <input type="submit" value="Update Sequence Info"> `
+        newSeqForm.innerHTML = f;
+        poseCardContainer.appendChild(newSeqForm);
+        newSeqForm.addEventListener("submit", function(e){
+            updateSequence(e)
+        })
+    }
+
+    function updateSequence(e){
+        clearCurrentSeqContainer();
+        let newSeqName = e.target[0].value
+        let newSeqMemo = e.target[1].value
+        let newSeqStyle = e.target[2].value
+        let seqToUpdateId = e.target.id.slice(7)
+        console.log("seqToUpdateId is: ", seqToUpdateId)
+        e.preventDefault();                         // Does NOT have to be after newSeqName, etcs
+
+        fetch(`http://localhost:3000/sequences/${seqToUpdateId}`, {
+            method: 'PATCH',
+            headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
+            body: JSON.stringify({
+                "user_id": 4,                           // HARD-CODED !!!
+                "sequence_name": newSeqName,
+                "memo": newSeqMemo,
+                "yoga_style": newSeqStyle,
+                "seqToUpdateId": seqToUpdateId
+            })
+        }).then(res => (res.json() ))
+        .then(function (res){
+            console.log(res);
+            let currentSeq = document.createElement("P");
+            currentSeq.innerText = `Just Edited: ${res["sequence_name"]}.  Yoga Style: ${res["yoga_style"]}`
+            currentSeq.dataset.seqid = res["id"];
+            currentSeq.dataset.seqname = res["sequence_name"];
+            currentSeq.dataset.memo = res["memo"];
+            currentSeq.dataset.yogastyle = res["yoga_style"];
+            currentSeqContainer.appendChild(currentSeq);
+
+        })
+        clearPoseCardContainer();  
+    }
 
     function viewSequence(e){
         clearPoseCardContainer();
@@ -281,6 +321,40 @@ const sequencesUL = document.createElement("UL");
         })
     } //end of function
 
+    function appendSequenceLiDeleteBtn(seqLi){
+        // let sequenceLiDeleteBtn = document.createElement("BUTTON");
+        console.log("seqLi is: ", seqLi);
+        let spanDelete = document.createElement("span");
+        spanDelete.setAttribute("id", seqLi.dataset.seqid);
+        spanDelete.setAttribute("class", "delete");
+        spanDelete.innerHTML = " Delete "; //"&nbsp;&#10007;&nbsp;";
+        spanDelete.onclick = deleteSequence;
+        spanDelete.classList.add("nav-button")
+        seqLi.appendChild(spanDelete);
+    } //end of function
+
+
+
+    function deleteSequence(e){
+        e.preventDefault();
+        let seqIdToDelete = e.target.id;
+
+        fetch(`http://localhost:3000/sequences/${seqIdToDelete}`, {
+            method: 'DELETE',
+            headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
+            body: JSON.stringify({
+                 "id": seqIdToDelete
+            })
+        }).then(res => (res.json() ))
+        .then(function (res){
+            console.log(res);
+        })
+
+        let nodeToDisappear = (e.target).parentElement
+        nodeToDisappear.style.display = "none";
+    } //end of function
+
+
 
     function playSequence(apiSP){
         console.log("apiSP is: ", apiSP)
@@ -295,8 +369,6 @@ const sequencesUL = document.createElement("UL");
             holdTimes.push((pose.duration * 60 * 10) + totalTime )   // is 10 not 1000!!!!! 
             totalTime += pose.duration * 60 * 10
         }) // ends apiSP.forEach
-
-
 
         console.log("Hold times: ", holdTimes)
 
