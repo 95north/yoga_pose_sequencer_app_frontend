@@ -95,6 +95,11 @@ const sequencesUL = document.createElement("UL");
         .then( res => {
             console.log(res)
         })
+        clearCurrentSeqContainer()
+        currentSeqContainer.innerText = "Sequence Saved!"
+        setTimeout(function(){clearCurrentSeqContainer()}, 10000);
+        let saveSeqBtn = document.getElementById("save-seq")
+        saveSeqBtn.style.display = "none";
     } //end of saveSequence
 
 
