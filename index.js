@@ -77,9 +77,9 @@ const sequencesUL = document.createElement("UL");
         let currentSeq = currentSeqContainer.firstChild.dataset.seqid
         console.log( " currentSeq is: ", currentSeq)
 
-        // GET ALL POSES TO SAVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // poseIDs = array of array. [ [pose_id, order#, duration], [p,o,d].. ]
         let poseIDs = queryPoseCardSaveFlags(); // Call function
+        poseIDs = sortPoseOrder(poseIDs)
         let apiPostBody = []
 
         for (const pose of poseIDs) {
@@ -95,7 +95,32 @@ const sequencesUL = document.createElement("UL");
         .then( res => {
             console.log(res)
         })
-    } //end of function
+    } //end of saveSequence
+
+
+
+    function sortPoseOrder(seqArr){
+        let poseOrderOnlyArr = []
+        let retArr = []
+
+        for(let pose of seqArr){
+            poseOrderOnlyArr.push(pose[1]);
+        }
+
+        while (seqArr.length > 0){
+            for (let pose of seqArr) {
+                if (pose[1] == (Math.min(...poseOrderOnlyArr))){
+                    retArr.push(pose)
+                    let poseIndex = seqArr.indexOf(pose);
+                    seqArr.splice(poseIndex, 1)
+                    poseOrderOnlyArr.splice(poseIndex, 1)
+                }
+            }
+        }
+        return retArr;
+    }
+
+
 
     function queryPoseCardSaveFlags(){
         let arrayFlaggedPoseCards = []
@@ -482,10 +507,6 @@ const sequencesUL = document.createElement("UL");
       const buttonToDelete = document.getElementById(`flagBtn${poseId}`)
       buttonToDelete.remove()
 
-      // while (poseCard.firstChild) {
-      //   poseCard.removeChild(poseCard.firstChild);
-      // }
-
       const formForOrderAndDuration = document.createElement("form")
       formForOrderAndDuration.innerHTML =  `
       <form action="/action_page.php">
@@ -505,10 +526,10 @@ const sequencesUL = document.createElement("UL");
   } //end of function
 
   function getFlagPoseInfo(e, poseId){
-      e.preventDefault();
-      console.log("e.tag: ",  e.target[0].value )
+    e.preventDefault();
+    console.log("e.tag: ",  e.target[0].value )
 
-      let orderNo = e.target[0].value;
+    let orderNo = e.target[0].value;
     let durationNo = e.target[1].value;
     let flipCardInnerToFlag = document.getElementById(`poseId${poseId}`)
     console.log("flipCardInnerToFlag is:  ", flipCardInnerToFlag)
