@@ -70,7 +70,7 @@ const sequencesUL = document.createElement("UL");
         console.log("e target is: ", e)
         let saveSeqBtn = document.getElementById("save-seq")
         saveSeqBtn.style.display = "block";
-        saveSeqBtn.innerText = "Save Your Sequence"
+        // saveSeqBtn.innerText = "Save Your Sequence"
         saveSeqBtn.onclick = saveSequence;
     } //end of function
 
