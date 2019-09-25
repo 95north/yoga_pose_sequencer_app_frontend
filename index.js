@@ -6,7 +6,7 @@ const currentSeqContainer = document.getElementById("current-sequence");
 const poseCardContainer = document.querySelector(".flip-card")
 const posesDiv = document.querySelector(".poses-div")
 const sequencesUL = document.createElement("UL");
-const backendURL = "http://yoga-sequencer-backend.herokuapp.com"
+const backendURL = "https://yoga-sequencer-backend.herokuapp.com"
 
 
 //beginning of code
