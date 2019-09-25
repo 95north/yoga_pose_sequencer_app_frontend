@@ -6,6 +6,7 @@ const currentSeqContainer = document.getElementById("current-sequence");
 const poseCardContainer = document.querySelector(".flip-card")
 const posesDiv = document.querySelector(".poses-div")
 const sequencesUL = document.createElement("UL");
+const backendURL = "http://yoga-sequencer-backend.herokuapp.com"
 
 
 //beginning of code
@@ -36,7 +37,9 @@ const sequencesUL = document.createElement("UL");
         let newSeqStyle = e.target[2].value
         e.preventDefault();                         // Does NOT have to be after newSeqName, etcs
 
-        fetch('http://localhost:3000/sequences/', {
+        //fetch('http://localhost:3000/sequences/', {
+        fetch(`${backendURL}/sequences/`, {
+            
             method: 'POST',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
             body: JSON.stringify({
@@ -87,8 +90,10 @@ const sequencesUL = document.createElement("UL");
         for (const pose of poseIDs) {
             apiPostBody.push({sequence_id: currentSeq, pose_id: pose[0], order_no: pose[1], duration: pose[2] })
         }
+        
 
-        fetch(`http://localhost:3000/bulkcreatesp`, {
+        fetch(`${backendURL}/bulkcreatesp`, {
+        // fetch(`http://localhost:3000/bulkcreatesp`, {
             headers: { "Content-Type": "application/json; charset=utf-8" },
             method: 'POST',
             body: JSON.stringify(
@@ -156,8 +161,9 @@ const sequencesUL = document.createElement("UL");
     function fetchAllSequences(){
         clearPoseCardContainer();
         sequencesUL.classList.add("allSeqList")
-
-        fetch("http://localhost:3000/sequences/", {
+        
+        fetch(`${backendURL}/sequences/`, {
+        // fetch("http://localhost:3000/sequences/", {
             method: 'GET',
             headers: { "Content-Type": "application/json; charset=utf-8" }
             }).then(res => (res.json() ))
@@ -254,7 +260,8 @@ const sequencesUL = document.createElement("UL");
         console.log("seqToUpdateId is: ", seqToUpdateId)
         e.preventDefault();                         // Does NOT have to be after newSeqName, etcs
 
-        fetch(`http://localhost:3000/sequences/${seqToUpdateId}`, {
+        fetch(`${backendURL}/sequences/${seqToUpdateId}`, {        
+        // fetch(`http://localhost:3000/sequences/${seqToUpdateId}`, {
             method: 'PATCH',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
             body: JSON.stringify({
@@ -286,8 +293,9 @@ const sequencesUL = document.createElement("UL");
       
         console.log("seqToView is: ", seqToView);  
 
-
-        fetch(`http://localhost:3000/sp/${seqToView}`, {
+        
+        fetch(`${backendURL}/sp/${seqToView}`, {
+        // fetch(`http://localhost:3000/sp/${seqToView}`, {
             method: 'GET',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
             })
@@ -338,8 +346,10 @@ const sequencesUL = document.createElement("UL");
     function deleteSequence(e){
         e.preventDefault();
         let seqIdToDelete = e.target.id;
+        
 
-        fetch(`http://localhost:3000/sequences/${seqIdToDelete}`, {
+        fetch(`${backendURL}/sequences/${seqIdToDelete}`, {
+        // fetch(`http://localhost:3000/sequences/${seqIdToDelete}`, {
             method: 'DELETE',
             headers: { "Content-Type": "application/json; charset=utf-8", "Accept": 'application/json' },
             body: JSON.stringify({
@@ -398,7 +408,9 @@ const sequencesUL = document.createElement("UL");
     
         console.log("Pose ID is: ", poseId)
 
-        fetch(`http://localhost:3000/poses/${poseId}`)
+        
+        fetch(`${backendURL}/poses/${poseId}`)
+        // fetch(`http://localhost:3000/poses/${poseId}`)
         .then(function(response){
         return response.json()
         })
@@ -454,7 +466,9 @@ const sequencesUL = document.createElement("UL");
 
 
   function createPoseCard(){
-    fetch("http://localhost:3000/poses")
+    
+    fetch(`${backendURL}/poses`)
+    // fetch("http://localhost:3000/poses")
       .then(function(response){
         return response.json()
       })
